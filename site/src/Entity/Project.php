@@ -19,12 +19,26 @@ class Project
     #[ORM\Column(type: 'boolean')]
     private bool $isActive = true;
 
+    #[ORM\ManyToOne(targetEntity: Company::class)]
+
+    private ?Company $company = null;
+
+
     public function __construct(?string $id)
     {
         Assert::uuid($id);
         $this->id = $id;
     }
 
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): void
+    {
+        $this->company = $company;
+    }
 
     public function getId(): ?string { return $this->id; }
 
