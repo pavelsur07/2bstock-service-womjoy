@@ -1,0 +1,12 @@
+<?php
+
+namespace App\Entity;
+
+class PnlCategory
+{
+    //private UuidInterface $id;
+    //private string $name;
+    //private ?PnlCategory $parent = null;
+    //private Company $company;
+    //private Collection $children;
+}

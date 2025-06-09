@@ -1,0 +1,31 @@
+{# templates/cash_account/index.html.twig #}
+{% extends 'base.html.twig' %}
+{% block body %}
+    <h2>Счета и кассы</h2>
+    <a href="{{ path('cash_account_new') }}" class="btn btn-primary mb-3">+ Новый счёт</a>
+
+    <div class="card">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Тип</th>
+                    <th>Начальный остаток</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for account in accounts %}
+                    <tr>
+                        <td>{{ account.name }}</td>
+                        <td>{{ account.type }}</td>
+                        <td>{{ account.openingBalance|number_format(2, '.', ' ') }} ₽</td>
+                        <td><a href="{{ path('cash_account_edit', {id: account.id}) }}">Редактировать</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

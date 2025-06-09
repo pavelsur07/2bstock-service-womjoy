@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Form;
+
+use App\Entity\CashAccount;
+use App\Entity\CashflowCategory;
+use App\Entity\CashflowTransaction;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+
+class CashflowTransactionType extends AbstractType
+{
+
+
+    public function buildForm(FormBuilderInterface $builder, array $options)
+    {
+        $builder
+            ->add('date', Type\DateType::class, [ 'widget' => 'single_text', 'label' => 'Дата' ])
+            ->add('amount', Type\MoneyType::class, [ 'currency' => 'RUB', 'label' => 'Сумма' ])
+            ->add('direction', Type\ChoiceType::class, [
+                'choices' => [ 'Доход' => CashflowTransaction::INCOME, 'Расход' => CashflowTransaction::EXPENSE ],
+                'label' => 'Тип операции'
+            ])
+            ->add('account', EntityType::class, [
+                'class' => CashAccount::class,
+                'choice_label' => 'name',
+            ])
+            ->add('category', EntityType::class, [
+                'class' => CashflowCategory::class,
+                'choice_label' => 'name',
+                'label' => 'Категория'
+            ])
+            ->add('comment', Type\TextareaType::class, [ 'required' => false, 'label' => 'Комментарий' ]);
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([]);
+    }
+}

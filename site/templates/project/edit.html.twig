@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ project is defined ? 'Редактировать' : 'Создать' }} проект{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h2>{{ project is defined ? 'Редактировать' : 'Создать' }} проект</h2>
+
+        {{ form_start(form) }}
+        {{ form_row(form.name) }}
+        {{ form_row(form.isActive) }}
+        <button class="btn btn-success">Сохранить</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

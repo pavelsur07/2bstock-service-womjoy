@@ -1,0 +1,13 @@
+<?php
+
+namespace App\Entity;
+
+class PnlTransaction
+{
+    //private UuidInterface $id;
+    //private \DateTimeInterface $date;
+    //private float $amount;
+    //private string $comment;
+    //private PnlCategory $category;
+    //private Company $company;
+}

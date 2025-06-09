@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+{# templates/finance/cashflow/edit.html.twig #}
+{% block title %}Редактировать транзакцию{% endblock %}
+{% block body %}
+    <h2>Редактировать транзакцию</h2>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn btn-success mt-3">Сохранить изменения</button>
+    <a class="btn mt-3 btn-blue" href="{{ path('cashflow_index') }}"> Обратно</a>
+    {{ form_end(form) }}
+{% endblock %}

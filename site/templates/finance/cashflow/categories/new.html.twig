@@ -1,0 +1,11 @@
+{# templates/finance/cashflow/categories/new.html.twig #}
+{% extends 'base.html.twig' %}
+{% block title %}Новая категория ДДС{% endblock %}
+{% block body %}
+    <h2>Создание новой категории</h2>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn btn-success mt-3">Сохранить</button>
+    <a class="btn mt-3 btn-blue" href="{{ path('cashflow_category_index') }}"> Обратно</a>
+    {{ form_end(form) }}
+{% endblock %}

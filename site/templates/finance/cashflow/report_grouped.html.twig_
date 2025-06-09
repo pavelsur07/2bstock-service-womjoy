@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+{# templates/finance/cashflow/report_grouped.html.twig #}
+{% block title %}Детализированный отчет по ДДС{% endblock %}
+{% block body %}
+    <div class="page-header d-print-none">
+        <div class="container-xl">
+            <div class="row g-2 align-items-center">
+                <div class="col">
+                    <h2 class="page-title">Детализированный отчет по ДДС</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-body">
+        <div class="container-xl">
+            {% for month, categories in report %}
+                <div class="card my-4">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ month }}</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table card-table table-vcenter">
+                            <thead>
+                            <tr>
+                                <th>Категория</th>
+                                <th>Доходы</th>
+                                <th>Расходы</th>
+                                <th>Баланс</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for category, values in categories %}
+                                <tr>
+                                    <td>{{ category }}</td>
+                                    <td class="text-green">{{ values.income|default(0)|number_format(0, '.', ' ') }} ₽</td>
+                                    <td class="text-red">{{ values.expense|default(0)|number_format(0, '.', ' ') }} ₽</td>
+                                    <td class="fw-bold">
+                                        {{ (values.income - values.expense)|number_format(0, '.', ' ') }} ₽
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% else %}
+                <p>Нет данных для отображения</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+

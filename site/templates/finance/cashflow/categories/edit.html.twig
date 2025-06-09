@@ -1,0 +1,11 @@
+{# templates/finance/cashflow/categories/edit.html.twig #}
+{% extends 'base.html.twig' %}
+{% block title %}Редактирование категории{% endblock %}
+{% block body %}
+    <h2>Редактировать категорию</h2>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn btn-success mt-3">Сохранить изменения</button>
+    <a class="btn mt-3 btn-blue" href="{{ path('cashflow_category_index') }}"> Обратно</a>
+    {{ form_end(form) }}
+{% endblock %}

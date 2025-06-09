@@ -1,0 +1,91 @@
+{# templates/finance/cashflow/report_grouped.html.twig #}
+{% extends 'base.html.twig' %}
+{% block title %}ДДС — по месяцам (версия из ТЗ){% endblock %}
+{% block body %}
+    <div class="container-xl">
+        <div class="page-header mb-3">
+            <h2>Отчёт ДДС (по строкам)</h2>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="thead-light">
+                <tr>
+                    <th>Категория</th>
+                    {% for month in months %}
+                        <th class="text-center">{{ month|date('F Y') }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="fw-bold bg-light">
+                    <td>Остаток на начало</td>
+                    {% for month in months %}
+                        <td class="text-end">{{ monthly[month].start|number_format(0, '.', ' ') }} ₽</td>
+                    {% endfor %}
+                </tr>
+
+                {#{% for parent in categories %}
+                    <tr class="fw-bold">
+                        <td>{{ parent }}</td>
+                        {% for month in months %}
+                            <td class="text-end">{{ report[parent]['__total'][month]|default(0)|number_format(0, '.', ' ') }}</td>
+                        {% endfor %}
+                    </tr>
+
+                    {% for childName, values in report[parent] %}
+                        {% if childName != '__total' %}
+                            <tr>
+                                <td class="ps-4">{{ childName }}</td>
+                                {% for month in months %}
+                                    <td class="text-end">{{ values[month]|default(0)|number_format(0, '.', ' ') }}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}#}
+
+
+
+
+                {% for parent in categories %}
+                    {% set direction = categoryDirections[parent]|default('income') %}
+                    {% set is_expense = direction == 'expense' %}
+
+                    <tr class="fw-bold">
+                        <td>{{ parent }}</td>
+                        {% for month in months %}
+                            {% set value = report[parent]['__total'][month]|default(0) %}
+                            <td class="text-end {{ is_expense ? 'text-danger' : '' }}">
+                                {{ is_expense and value != 0 ? '-' : '' }}{{ value|number_format(0, '.', ' ') }}
+                            </td>
+                        {% endfor %}
+                    </tr>
+
+                    {% for childName, values in report[parent] %}
+                        {% if childName != '__total' %}
+                            <tr>
+                                <td class="ps-4">{{ childName }}</td>
+                                {% for month in months %}
+                                    {% set value = values[month]|default(0) %}
+                                    <td class="text-end {{ is_expense ? 'text-danger' : '' }}">
+                                        {{ is_expense and value != 0 ? '-' : '' }}{{ value|number_format(0, '.', ' ') }}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+                <tr class="fw-bold bg-light">
+                    <td>Остаток на конец</td>
+                    {% for month in months %}
+                        <td class="text-end">{{ monthly[month].end|number_format(0, '.', ' ') }} ₽</td>
+                    {% endfor %}
+                </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+{% endblock %}
+

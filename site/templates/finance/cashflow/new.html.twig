@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+{# templates/finance/cashflow/new.html.twig #}
+{% block title %}Новая транзакция ДДС{% endblock %}
+{% block body %}
+    <h2>Добавить транзакцию</h2>
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn btn-success mt-3">Сохранить</button>
+    <a class="btn mt-3 btn-blue" href="{{ path('cashflow_index') }}"> Обратно</a>
+    {{ form_end(form) }}
+{% endblock %}
