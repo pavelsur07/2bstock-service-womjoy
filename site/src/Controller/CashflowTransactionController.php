@@ -20,7 +20,6 @@ class CashflowTransactionController extends AbstractController
     #[Route('/finance/cashflow', name: 'cashflow_index')]
     public function index(CashflowTransactionRepository $repository): Response
     {
-        //$transactions = $repository->findBy(['company' => $this->getUser()->getCompanies()[0]]);
         $transactions = $repository->listByCompanyId($this->getUser()->getCompanies()[0]->getId());
         return $this->render('finance/cashflow/index.html.twig', [
             'transactions' => $transactions
@@ -31,19 +30,14 @@ class CashflowTransactionController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $transaction = new CashflowTransaction(Uuid::uuid4()->toString());
-        $form = $this->createForm(CashflowTransactionType::class, []);
+        $form = $this->createForm(CashflowTransactionType::class,$transaction,
+            [
+                'company' => $this->getUser()->getCompanies()[0]
+            ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $data = $form->getData();
-            $transaction->setCompany($this->getUser()->getCompanies()[0]);
-            $transaction->setDirection($data['direction']);
-            $transaction->setAmount($data['amount']);
-            $transaction->setDate(DateTimeImmutable::createFromInterface($data['date']));
-            $transaction->setCategory($data['category']);
-            $transaction->setComment($data['comment']);
-            $transaction->setAccount($data['account']);
             $em->persist($transaction);
             $em->flush();
             return $this->redirectToRoute('cashflow_index');
@@ -56,24 +50,14 @@ class CashflowTransactionController extends AbstractController
     #[Route('/finance/cashflow/{id}/edit', name: 'cashflow_edit')]
     public function edit(CashflowTransaction $transaction, Request $request, EntityManagerInterface $em): Response
     {
-        $form = $this->createForm(CashflowTransactionType::class, [
-            'direction' => $transaction->getDirection(),
-            'amount' => $transaction->getAmount(),
-            'category' => $transaction->getCategory(),
-            'comment' => $transaction->getComment(),
-            'date' => $transaction->getDate()
-        ]);
+        $form = $this->createForm(CashflowTransactionType::class, $transaction, [
+            'company' => $this->getUser()->getCompanies()[0]
+        ],);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $data = $form->getData();
-            $transaction->setDirection($data['direction']);
-            $transaction->setAmount($data['amount']);
-            $transaction->setDate(DateTimeImmutable::createFromInterface($data['date']));
-            $transaction->setCategory($data['category']);
-            $transaction->setComment($data['comment']);
-            $transaction->setAccount($data['account']);
             $em->flush();
             return $this->redirectToRoute('cashflow_index');
         }

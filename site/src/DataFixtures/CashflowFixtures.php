@@ -7,6 +7,7 @@ use App\Entity\CashAccount;
 use App\Entity\CashflowCategory;
 use App\Entity\CashflowTransaction;
 use App\Entity\Company;
+use App\Entity\Project;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -20,6 +21,7 @@ class CashflowFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         $company = $this->getReference(CompanyFixtures::REFERENCE_COMPANY, Company::class);
+        $project = $this->getReference(ProjectFixtures::REFERENCE_PROJECT, Project::class);
         // --- Счет и Касса --- //
 
         $bank = new CashAccount(Uuid::uuid4()->toString());
@@ -119,6 +121,7 @@ class CashflowFixtures extends Fixture implements DependentFixtureInterface
             $transaction->setCategory($category);
             $transaction->setCompany($company);
             $transaction->setAccount($account);
+            $transaction->setProject($project);
 
             $manager->persist($transaction);
         }
@@ -130,6 +133,7 @@ class CashflowFixtures extends Fixture implements DependentFixtureInterface
     {
         return [
             CompanyFixtures::class,
+            ProjectFixtures::class,
         ];
     }
 }

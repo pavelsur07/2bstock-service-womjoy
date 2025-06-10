@@ -10,8 +10,6 @@ use Webmozart\Assert\Assert;
 class CashflowTransaction
 {
 
-
-
     public const INCOME = 'income';
     public const EXPENSE = 'expense';
 
@@ -43,6 +41,11 @@ class CashflowTransaction
     #[ORM\JoinColumn(nullable: false)]
     private ?CashAccount $account = null;
 
+    #[ORM\ManyToOne(targetEntity: Project::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Project $project = null;
+
+
     public function __construct(string $id)
     {
         Assert::uuid($id);
@@ -54,6 +57,11 @@ class CashflowTransaction
     public function getDate(): \DateTimeInterface { return $this->date; }
     public function setDate(\DateTimeInterface $date): self { $this->date = $date; return $this; }
     public function getAmount(): float { return $this->amount; }
+
+    public function getAccount(): ?CashAccount
+    {
+        return $this->account;
+    }
 
     public function setAccount(?CashAccount $account): void
     {
@@ -87,4 +95,16 @@ class CashflowTransaction
     public function setCategory(CashflowCategory $category): self { $this->category = $category; return $this; }
     public function getCompany(): Company { return $this->company; }
     public function setCompany(Company $company): self { $this->company = $company; return $this; }
+
+    public function getProject(): ?Project
+    {
+        return $this->project;
+    }
+
+    public function setProject(?Project $project): void
+    {
+        $this->project = $project;
+    }
+
+
 }
