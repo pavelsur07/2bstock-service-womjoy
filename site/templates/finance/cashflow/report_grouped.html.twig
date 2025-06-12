@@ -33,6 +33,12 @@
                     {% endfor %}
                 </select>
             </div>
+            <div class="col-auto">
+                <input type="date" name="dateFrom" value="{{ dateFrom ? dateFrom|date('Y-m-d') }}" class="form-control" onchange="this.form.submit()">
+            </div>
+            <div class="col-auto">
+                <input type="date" name="dateTo" value="{{ dateTo ? dateTo|date('Y-m-d') }}" class="form-control" onchange="this.form.submit()">
+            </div>
         </form>
 
         <div class="table-responsive">

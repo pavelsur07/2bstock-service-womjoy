@@ -23,9 +23,19 @@ class CashflowReportService
         $this->projectRepository = $projectRepository;
     }
 
-    public function build(Company $company, ?string $projectId = null): array
+    public function build(
+        Company $company,
+        ?string $projectId = null,
+        ?\DateTimeImmutable $dateFrom = null,
+        ?\DateTimeImmutable $dateTo = null,
+    ): array
     {
-        $transactions = $this->transactionRepository->listByCompanyId($company->getId(), $projectId);
+        $transactions = $this->transactionRepository->listByCompanyId(
+            $company->getId(),
+            $projectId,
+            $dateFrom,
+            $dateTo,
+        );
 
         $months = [];
         $report = [];
@@ -97,6 +107,8 @@ class CashflowReportService
             'rootCategories' => $rootCategories,
             'projects' => $projects,
             'selectedProject' => $projectId,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
         ];
     }
 }

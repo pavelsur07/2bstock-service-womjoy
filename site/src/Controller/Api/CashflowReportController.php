@@ -15,8 +15,15 @@ class CashflowReportController extends AbstractController
     {
         $company = $this->getUser()->getCompanies()[0];
         $projectId = $request->query->get('project');
+        $dateFrom = $request->query->get('dateFrom');
+        $dateTo = $request->query->get('dateTo');
 
-        $data = $service->build($company, $projectId ?: null);
+        $data = $service->build(
+            $company,
+            $projectId ?: null,
+            $dateFrom ? new \DateTimeImmutable($dateFrom) : null,
+            $dateTo ? new \DateTimeImmutable($dateTo) : null,
+        );
 
         // convert entities to simple arrays for JSON response
         $data['rootCategories'] = array_map(static fn($c) => [
