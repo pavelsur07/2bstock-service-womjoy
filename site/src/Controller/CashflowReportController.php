@@ -21,7 +21,6 @@ class CashflowReportController extends AbstractController
         $months = [];
         $report = [];
         $balances = [];
-        $categoryDirections = [];
 
         // стартовый баланс по всем счетам
         $startBalance = 0;
@@ -52,16 +51,11 @@ class CashflowReportController extends AbstractController
                 $cur = $cur->getParent();
             }
 
-            $direction = $txn->getDirection();
             $amount = $txn->getAmount();
+            $direction = $txn->getDirection();
+            $signed = $direction === 'expense' ? -$amount : $amount;
 
-            foreach ($path as $name) {
-                if (!isset($categoryDirections[$name])) {
-                    $categoryDirections[$name] = $direction;
-                }
-            }
-
-            $addToReport($report, $path, $month, $amount);
+            $addToReport($report, $path, $month, $signed);
 
             $balances[$month][$direction] = ($balances[$month][$direction] ?? 0) + $amount;
         }
@@ -100,7 +94,6 @@ class CashflowReportController extends AbstractController
             'monthly' => $monthly,
             'months' => $monthKeys,
             'rootCategories' => $rootCategories,
-            'categoryDirections' => $categoryDirections,
         ]);
     }
 }
