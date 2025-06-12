@@ -27,7 +27,7 @@ class CashflowCategoryRepository
         Assert::uuid($id);
         $object = $this->repo->find($id);
         if ($object === null) {
-            throw new DomainException('CashFloCategory not fount');
+            throw new DomainException(sprintf('CashflowCategory %s not found', $id));
         }
 
         return $object;
