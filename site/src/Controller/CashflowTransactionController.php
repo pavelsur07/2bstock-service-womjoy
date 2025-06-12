@@ -47,6 +47,7 @@ class CashflowTransactionController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            $transaction->setCompany($this->getUser()->getCompanies()[0]);
             $em->persist($transaction);
             $em->flush();
             return $this->redirectToRoute('cashflow_index');
