@@ -25,4 +25,13 @@ class ProjectRepository
     {
         return $this->repo->findAll();
     }
+
+    public function listByCompanyId(string $companyId): array
+    {
+        return $this->repo->findBy([
+            'company' => $companyId,
+        ], [
+            'name' => 'ASC',
+        ]);
+    }
 }

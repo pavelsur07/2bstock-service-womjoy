@@ -24,6 +24,17 @@
             <h2>Отчёт ДДС (по строкам)</h2>
         </div>
 
+        <form method="get" class="row mb-3">
+            <div class="col-auto">
+                <select name="project" class="form-select" onchange="this.form.submit()">
+                    <option value="">Все проекты</option>
+                    {% for project in projects %}
+                        <option value="{{ project.id }}" {% if project.id == selectedProject %}selected{% endif %}>{{ project.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
                 <thead class="thead-light">

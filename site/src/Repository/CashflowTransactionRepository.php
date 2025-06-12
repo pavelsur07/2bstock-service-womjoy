@@ -21,10 +21,21 @@ class CashflowTransactionRepository
         $this->repo = $em->getRepository(CashflowTransaction::class);
     }
 
-    public function listByCompanyId(string $id): array
+    public function listByCompanyId(string $id, ?string $projectId = null): array
     {
         Assert::uuid($id);
-        return $this->repo->findBy(['company' => $id]);
+
+        $qb = $this->repo->createQueryBuilder('t')
+            ->andWhere('t.company = :company')
+            ->setParameter('company', $id);
+
+        if ($projectId !== null) {
+            Assert::uuid($projectId);
+            $qb->andWhere('t.project = :project')
+                ->setParameter('project', $projectId);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     public function countByCompanyId(string $id): int

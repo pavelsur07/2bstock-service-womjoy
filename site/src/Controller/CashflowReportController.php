@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Repository\CashflowCategoryRepository;
 use App\Repository\CashflowTransactionRepository;
+use App\Repository\ProjectRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -12,11 +14,14 @@ class CashflowReportController extends AbstractController
 {
     #[Route('/finance/cashflow/report', name: 'cashflow_report')]
     public function index(
+        Request $request,
         CashflowTransactionRepository $repository,
-        CashflowCategoryRepository $categoryRepository
+        CashflowCategoryRepository $categoryRepository,
+        ProjectRepository $projectRepository,
     ): Response {
         $company = $this->getUser()->getCompanies()[0];
-        $transactions = $repository->listByCompanyId($company->getId());
+        $projectId = $request->query->get('project');
+        $transactions = $repository->listByCompanyId($company->getId(), $projectId ?: null);
 
         $months = [];
         $report = [];
@@ -84,6 +89,8 @@ class CashflowReportController extends AbstractController
             'sortOrder' => 'ASC',
         ]);
 
+        $projects = $projectRepository->listByCompanyId($company->getId());
+
 
 
 
@@ -94,6 +101,8 @@ class CashflowReportController extends AbstractController
             'monthly' => $monthly,
             'months' => $monthKeys,
             'rootCategories' => $rootCategories,
+            'projects' => $projects,
+            'selectedProject' => $projectId,
         ]);
     }
 }
