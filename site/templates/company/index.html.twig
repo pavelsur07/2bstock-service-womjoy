@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Компании{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h2>Компании</h2>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Название</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for company in companies %}
+                <tr>
+                    <td>
+                        <a href="{{ path('company_edit', {id: company.id}) }}">{{ company.name }}</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="1">Нет компаний</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
