@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+{% block title %}Компании{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <h2>Компании</h2>
+        <a href="{{ path('company_new') }}" class="btn btn-primary mb-3">Добавить компанию</a>
+
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Название</th>
+                <th>Дата создания</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for company in companies %}
+                <tr>
+                    <td>{{ company.name }}</td>
+                    <td>{{ company.createdAt|date('Y-m-d H:i') }}</td>
+                    <td>
+                        <a href="{{ path('company_edit', {id: company.id}) }}" class="btn btn-sm btn-warning">Редактировать</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="3">Нет компаний</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
