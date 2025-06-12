@@ -27,4 +27,31 @@ class CashflowTransactionRepository
         return $this->repo->findBy(['company' => $id]);
     }
 
+    public function countByCompanyId(string $id): int
+    {
+        Assert::uuid($id);
+        return (int)$this->repo->createQueryBuilder('t')
+            ->select('count(t.id)')
+            ->andWhere('t.company = :company')
+            ->setParameter('company', $id)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function paginateByCompanyId(string $id, int $page, int $perPage): array
+    {
+        Assert::uuid($id);
+        Assert::greaterThanEq($page, 1);
+        Assert::greaterThanEq($perPage, 1);
+
+        $qb = $this->repo->createQueryBuilder('t')
+            ->andWhere('t.company = :company')
+            ->setParameter('company', $id)
+            ->orderBy('t.date', 'DESC')
+            ->setFirstResult(($page - 1) * $perPage)
+            ->setMaxResults($perPage);
+
+        return $qb->getQuery()->getResult();
+    }
+
 }
