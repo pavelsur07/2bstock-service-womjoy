@@ -21,7 +21,7 @@ class CashflowTransactionRepository
         $this->repo = $em->getRepository(CashflowTransaction::class);
     }
 
-    public function listByCompanyId(string $id, ?string $projectId = null): array
+    public function listByCompanyId(string $id, ?string $projectId = null, ?\DateTimeImmutable $dateFrom = null, ?\DateTimeImmutable $dateTo = null): array
     {
         Assert::uuid($id);
 
@@ -33,6 +33,16 @@ class CashflowTransactionRepository
             Assert::uuid($projectId);
             $qb->andWhere('t.project = :project')
                 ->setParameter('project', $projectId);
+        }
+
+        if ($dateFrom !== null) {
+            $qb->andWhere('t.date >= :dateFrom')
+                ->setParameter('dateFrom', $dateFrom);
+        }
+
+        if ($dateTo !== null) {
+            $qb->andWhere('t.date <= :dateTo')
+                ->setParameter('dateTo', $dateTo);
         }
 
         return $qb->getQuery()->getResult();
