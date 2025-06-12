@@ -18,11 +18,20 @@ use Symfony\Component\Routing\Attribute\Route;
 class CashflowTransactionController extends AbstractController
 {
     #[Route('/finance/cashflow', name: 'cashflow_index')]
-    public function index(CashflowTransactionRepository $repository): Response
+    public function index(Request $request, CashflowTransactionRepository $repository): Response
     {
-        $transactions = $repository->listByCompanyId($this->getUser()->getCompanies()[0]->getId());
+        $page = max(1, (int)$request->query->get('page', 1));
+        $perPage = 10;
+        $companyId = $this->getUser()->getCompanies()[0]->getId();
+
+        $transactions = $repository->paginateByCompanyId($companyId, $page, $perPage);
+        $total = $repository->countByCompanyId($companyId);
+        $pages = (int)ceil($total / $perPage);
+
         return $this->render('finance/cashflow/index.html.twig', [
-            'transactions' => $transactions
+            'transactions' => $transactions,
+            'page' => $page,
+            'pages' => $pages,
         ]);
     }
 

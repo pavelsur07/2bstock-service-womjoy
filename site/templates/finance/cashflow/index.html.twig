@@ -23,4 +23,15 @@
         {% endfor %}
         </tbody>
     </table>
+    {% if pages > 1 %}
+        <nav>
+            <ul class="pagination">
+                {% for p in 1..pages %}
+                    <li class="page-item{% if p == page %} active{% endif %}">
+                        <a class="page-link" href="{{ path('cashflow_index', { page: p }) }}">{{ p }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    {% endif %}
 {% endblock %}
