@@ -122,6 +122,27 @@ class CashflowCategory
     {
         return $this->name;
     }
+
+    public function isLeaf(): bool
+    {
+        return $this->children->isEmpty();
+    }
+
+    public function getDepth(): int
+    {
+        $depth = 0;
+        $parent = $this->getParent();
+        while ($parent !== null) {
+            $depth++;
+            $parent = $parent->getParent();
+        }
+        return $depth;
+    }
+
+    public function getIndentedName(): string
+    {
+        return str_repeat('-- ', $this->getDepth()) . $this->name;
+    }
     /*public function getTransactions(): Collection
     {
         return $this->transactions;
