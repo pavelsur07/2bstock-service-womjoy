@@ -11,14 +11,17 @@ use Symfony\Component\Routing\Attribute\Route;
 class CashflowReportController extends AbstractController
 {
     #[Route('/finance/cashflow/report', name: 'cashflow_report')]
-    public function index(CashflowTransactionRepository $repository, CashflowCategoryRepository $categoryRepository): Response
-    {
+    public function index(
+        CashflowTransactionRepository $repository,
+        CashflowCategoryRepository $categoryRepository
+    ): Response {
         $company = $this->getUser()->getCompanies()[0];
         $transactions = $repository->listByCompanyId($company->getId());
 
         $months = [];
         $report = [];
         $balances = [];
+        $categoryDirections = [];
 
         // стартовый баланс по всем счетам
         $startBalance = 0;
@@ -26,27 +29,39 @@ class CashflowReportController extends AbstractController
             $startBalance += $account->getOpeningBalance();
         }
 
+        $addToReport = function (&$node, array $path, string $month, float $amount) use (&$addToReport) {
+            $name = array_shift($path);
+            if (!isset($node[$name])) {
+                $node[$name] = ['__total' => [], '__children' => []];
+            }
+            $node[$name]['__total'][$month] = ($node[$name]['__total'][$month] ?? 0) + $amount;
+            if ($path) {
+                $addToReport($node[$name]['__children'], $path, $month, $amount);
+            }
+        };
+
         foreach ($transactions as $txn) {
             $month = $txn->getDate()->format('Y-m');
             $months[$month] = true;
 
             $category = $txn->getCategory();
-            $parent = $category->getParent();
-            $parentName = $parent ? $parent->getName() : $category->getName();
-            $childName = $parent ? $category->getName() : null;
+            $path = [];
+            $cur = $category;
+            while ($cur !== null && count($path) < 4) {
+                array_unshift($path, $cur->getName());
+                $cur = $cur->getParent();
+            }
 
             $direction = $txn->getDirection();
             $amount = $txn->getAmount();
 
-            if (!isset($report[$parentName])) {
-                $report[$parentName] = [];
+            foreach ($path as $name) {
+                if (!isset($categoryDirections[$name])) {
+                    $categoryDirections[$name] = $direction;
+                }
             }
 
-            if ($childName) {
-                $report[$parentName][$childName][$month] = ($report[$parentName][$childName][$month] ?? 0) + $amount;
-            }
-
-            $report[$parentName]['__total'][$month] = ($report[$parentName]['__total'][$month] ?? 0) + $amount;
+            $addToReport($report, $path, $month, $amount);
 
             $balances[$month][$direction] = ($balances[$month][$direction] ?? 0) + $amount;
         }
@@ -67,35 +82,13 @@ class CashflowReportController extends AbstractController
             $monthly[$month]['end'] = $runningBalance;
         }
 
-        // получаем родительские категории с сортировкой
-        $parentCategories = $categoryRepository->findBy([
+        // получаем корневые категории с сортировкой
+        $rootCategories = $categoryRepository->findBy([
             'company' => $company,
-            'parent' => null
+            'parent' => null,
         ], [
-            'sortOrder' => 'ASC'
+            'sortOrder' => 'ASC',
         ]);
-
-        $sortedCategoryNames = [];
-        foreach ($parentCategories as $parentCat) {
-            $name = $parentCat->getName();
-            if (isset($report[$name])) {
-                $sortedCategoryNames[] = $name;
-            }
-        }
-
-        $categoryDirections = [];
-
-        foreach ($transactions as $txn) {
-            $category = $txn->getCategory();
-            $parent = $category->getParent();
-            $parentName = $parent ? $parent->getName() : $category->getName();
-            $direction = $txn->getDirection();
-
-            // фиксируем, что эта категория относится к income/expense
-            if (!isset($categoryDirections[$parentName])) {
-                $categoryDirections[$parentName] = $direction;
-            }
-        }
 
 
 
@@ -106,8 +99,8 @@ class CashflowReportController extends AbstractController
             'report' => $report,
             'monthly' => $monthly,
             'months' => $monthKeys,
-            'categories' => $sortedCategoryNames,
-            'categoryDirections' => $categoryDirections
+            'rootCategories' => $rootCategories,
+            'categoryDirections' => $categoryDirections,
         ]);
     }
 }
