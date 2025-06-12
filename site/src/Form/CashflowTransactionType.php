@@ -22,7 +22,11 @@ class CashflowTransactionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('date', Type\DateType::class, [ 'widget' => 'single_text', 'label' => 'Дата' ])
+            ->add('date', Type\DateType::class, [
+                'widget' => 'single_text',
+                'label' => 'Дата',
+                'input' => 'datetime_immutable',
+            ])
             ->add('project', EntityType::class, [
                 'class' => Project::class,
                 'label' => 'Проект',

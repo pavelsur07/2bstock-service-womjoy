@@ -18,7 +18,7 @@ class CashflowTransaction
     private ?string $id = null;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private \DateTimeInterface $date;
+    private \DateTimeImmutable $date;
 
     #[ORM\Column(type: 'float')]
     private float $amount;
@@ -54,8 +54,8 @@ class CashflowTransaction
 
 
     public function getId(): ?string { return $this->id; }
-    public function getDate(): \DateTimeInterface { return $this->date; }
-    public function setDate(\DateTimeInterface $date): self { $this->date = $date; return $this; }
+    public function getDate(): \DateTimeImmutable { return $this->date; }
+    public function setDate(\DateTimeImmutable $date): self { $this->date = $date; return $this; }
     public function getAmount(): float { return $this->amount; }
 
     public function getAccount(): ?CashAccount
