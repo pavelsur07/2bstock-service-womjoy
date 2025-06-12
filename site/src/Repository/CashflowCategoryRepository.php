@@ -39,6 +39,20 @@ class CashflowCategoryRepository
         return $this->repo->findBy(['company' => $id]);
     }
 
+    public function listLeavesByCompanyId(string $id): array
+    {
+        Assert::uuid($id);
+        return $this->repo->createQueryBuilder('c')
+            ->leftJoin('c.children', 'child')
+            ->andWhere('c.company = :company')
+            ->andWhere('child.id IS NULL')
+            ->setParameter('company', $id)
+            ->orderBy('c.sortOrder', 'ASC')
+            ->addOrderBy('c.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findBy(array $criteria, array|null $orderBy = null): array
     {
         return $this->repo->findBy($criteria, $orderBy);

@@ -47,8 +47,17 @@ class CashflowTransactionType extends AbstractType
             ])
             ->add('category', EntityType::class, [
                 'class' => CashflowCategory::class,
-                'choice_label' => 'name',
-                'label' => 'Категория'
+                'choice_label' => fn (CashflowCategory $category) => $category->getIndentedName(),
+                'label' => 'Категория',
+                'query_builder' => function (EntityRepository $er) use ($options) {
+                    return $er->createQueryBuilder('c')
+                        ->leftJoin('c.children', 'child')
+                        ->where('c.company = :company')
+                        ->andWhere('child.id IS NULL')
+                        ->setParameter('company', $options['company'] ?? null)
+                        ->orderBy('c.sortOrder', 'ASC')
+                        ->addOrderBy('c.name', 'ASC');
+                },
             ])
             ->add('comment', Type\TextareaType::class, [ 'required' => false, 'label' => 'Комментарий' ]);
     }
