@@ -1,20 +1,20 @@
 {# templates/finance/cashflow/report_grouped.html.twig #}
 {% extends 'base.html.twig' %}
 {% block title %}ДДС — по месяцам (версия из ТЗ){% endblock %}
-{% macro render_node(name, node, level, months, categoryDirections) %}
-    {% set is_expense = (categoryDirections[name]|default('income')) == 'expense' %}
+{% macro render_node(name, node, level, months) %}
     <tr class="{{ level == 1 ? 'fw-bold' : '' }}">
         <td class="ps-{{ (level - 1) * 2 }}">{{ name }}</td>
         {% for month in months %}
             {% set value = node.__total[month]|default(0) %}
-            <td class="text-end {{ is_expense ? 'text-danger' : '' }}">
-                {{ is_expense and value != 0 ? '-' : '' }}{{ value|number_format(0, '.', ' ') }}
+            {% set is_negative = value < 0 %}
+            <td class="text-end {{ is_negative ? 'text-danger' : '' }}">
+                {{ is_negative ? '-' : '' }}{{ value|abs|number_format(0, '.', ' ') }}
             </td>
         {% endfor %}
     </tr>
     {% if level < 4 %}
         {% for childName, childNode in node.__children %}
-            {{ _self.render_node(childName, childNode, level + 1, months, categoryDirections) }}
+            {{ _self.render_node(childName, childNode, level + 1, months) }}
         {% endfor %}
     {% endif %}
 {% endmacro %}
@@ -50,7 +50,7 @@
                 {% for root in rootCategories %}
                     {% set name = root.name %}
                     {% if report[name] is defined %}
-                        {{ macros.render_node(name, report[name], 1, months, categoryDirections) }}
+                        {{ macros.render_node(name, report[name], 1, months) }}
                     {% endif %}
                 {% endfor %}
                 <tr class="fw-bold bg-light">
