@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="container-xl">
+        <h2>{{ app.request.get('_route') ends with 'new' ? 'Создать компанию' : 'Редактировать компанию' }}</h2>
+        {{ form_start(form) }}
+        {{ form_row(form.name) }}
+        <button class="btn btn-success">Сохранить</button>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
