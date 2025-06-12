@@ -1,6 +1,23 @@
 {# templates/finance/cashflow/report_grouped.html.twig #}
 {% extends 'base.html.twig' %}
 {% block title %}ДДС — по месяцам (версия из ТЗ){% endblock %}
+{% macro render_node(name, node, level, months, categoryDirections) %}
+    {% set is_expense = (categoryDirections[name]|default('income')) == 'expense' %}
+    <tr class="{{ level == 1 ? 'fw-bold' : '' }}">
+        <td class="ps-{{ (level - 1) * 2 }}">{{ name }}</td>
+        {% for month in months %}
+            {% set value = node.__total[month]|default(0) %}
+            <td class="text-end {{ is_expense ? 'text-danger' : '' }}">
+                {{ is_expense and value != 0 ? '-' : '' }}{{ value|number_format(0, '.', ' ') }}
+            </td>
+        {% endfor %}
+    </tr>
+    {% if level < 4 %}
+        {% for childName, childNode in node.__children %}
+            {{ _self.render_node(childName, childNode, level + 1, months, categoryDirections) }}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
 {% block body %}
     <div class="container-xl">
         <div class="page-header mb-3">
@@ -25,56 +42,16 @@
                     {% endfor %}
                 </tr>
 
-                {#{% for parent in categories %}
-                    <tr class="fw-bold">
-                        <td>{{ parent }}</td>
-                        {% for month in months %}
-                            <td class="text-end">{{ report[parent]['__total'][month]|default(0)|number_format(0, '.', ' ') }}</td>
-                        {% endfor %}
-                    </tr>
-
-                    {% for childName, values in report[parent] %}
-                        {% if childName != '__total' %}
-                            <tr>
-                                <td class="ps-4">{{ childName }}</td>
-                                {% for month in months %}
-                                    <td class="text-end">{{ values[month]|default(0)|number_format(0, '.', ' ') }}</td>
-                                {% endfor %}
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                {% endfor %}#}
 
 
 
 
-                {% for parent in categories %}
-                    {% set direction = categoryDirections[parent]|default('income') %}
-                    {% set is_expense = direction == 'expense' %}
-
-                    <tr class="fw-bold">
-                        <td>{{ parent }}</td>
-                        {% for month in months %}
-                            {% set value = report[parent]['__total'][month]|default(0) %}
-                            <td class="text-end {{ is_expense ? 'text-danger' : '' }}">
-                                {{ is_expense and value != 0 ? '-' : '' }}{{ value|number_format(0, '.', ' ') }}
-                            </td>
-                        {% endfor %}
-                    </tr>
-
-                    {% for childName, values in report[parent] %}
-                        {% if childName != '__total' %}
-                            <tr>
-                                <td class="ps-4">{{ childName }}</td>
-                                {% for month in months %}
-                                    {% set value = values[month]|default(0) %}
-                                    <td class="text-end {{ is_expense ? 'text-danger' : '' }}">
-                                        {{ is_expense and value != 0 ? '-' : '' }}{{ value|number_format(0, '.', ' ') }}
-                                    </td>
-                                {% endfor %}
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
+                {% import _self as macros %}
+                {% for root in rootCategories %}
+                    {% set name = root.name %}
+                    {% if report[name] is defined %}
+                        {{ macros.render_node(name, report[name], 1, months, categoryDirections) }}
+                    {% endif %}
                 {% endfor %}
                 <tr class="fw-bold bg-light">
                     <td>Остаток на конец</td>
