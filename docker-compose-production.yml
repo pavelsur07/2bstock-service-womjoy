@@ -2,46 +2,88 @@ version: "3.9"
 
 services:
     
+    traefik:
+        image: traefik:3.3
+        command:
+            - --providers.docker=true
+            - --providers.docker.exposedByDefault=false
+            - --entryPoints.http.address=:80
+            - --entryPoints.https.address=:443
+            - --certificatesresolvers.myresolver.acme.tlschallenge=true
+            - --certificatesresolvers.myresolver.acme.email=info@2bstock.ru
+            - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+        ports:
+            - "80:80"
+            - "443:443"
+            - "8080:8080"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - ./letsencrypt:/letsencrypt
+        networks:
+            - traefik-public
+    
     php-fpm:
         build:
             context: .
             dockerfile: site/docker/production/php-fpm/Dockerfile
         container_name: php-fpm
         restart: always
-        env_file:
-            - .env
+        environment:
+            APP_ENV: ${APP_ENV}
+            DATABASE_URL: ${DATABASE_URL}
+            REDIS_URL: ${REDIS_URL}
         volumes:
             - .:/var/www/html
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.site.rule=Host(`app.2bstock.ru`)
+            - traefik.http.routers.site.entryPoints=https
+            - traefik.http.routers.site.tls.certresolver=myresolver
+            - traefik.http.services.site.loadbalancer.server.port=9000
         networks:
-            - app-network
+            - traefik-public
+            - default
     
     cli:
         build:
             context: .
             dockerfile: site/docker/production/cli/Dockerfile
-        container_name: php-cli
+        container_name: cli
         restart: always
-        env_file:
-            - .env
+        environment:
+            APP_ENV: ${APP_ENV}
+            DATABASE_URL: ${DATABASE_URL}
+            REDIS_URL: ${REDIS_URL}
         volumes:
             - .:/var/www/html
         networks:
-            - app-network
+            - default
     
-    nginx:
-        image: nginx:1.25-alpine
-        container_name: nginx
+    postgres:
+        image: postgres:15-alpine
+        container_name: postgres
         restart: always
-        ports:
-            - "80:80"
+        environment:
+            POSTGRES_DB: app
+            POSTGRES_USER: app
+            POSTGRES_PASSWORD: secret
         volumes:
-            - ./site/docker/common/nginx/conf.d:/etc/nginx/conf.d
-            - .:/var/www/html
-        depends_on:
-            - php-fpm
+            - postgres_data:/var/lib/postgresql/data
         networks:
-            - app-network
+            - default
+    
+    redis:
+        image: redis:alpine
+        container_name: redis
+        restart: always
+        networks:
+            - default
+
+volumes:
+    postgres_data:
 
 networks:
-    app-network:
+    traefik-public:
+        name: traefik-public
         driver: bridge
+    default:
