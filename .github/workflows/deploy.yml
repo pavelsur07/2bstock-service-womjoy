@@ -44,8 +44,7 @@ jobs:
                     cd /srv/2bstock-app &&
                     echo 'Waiting for cli container to be healthy...' &&
                     for i in {1..10}; do
-                      docker compose ps
-                      docker inspect --format='{{.State.Health.Status}}' cli | grep healthy && break
+                      docker inspect --format='{{.State.Health.Status}}' 2bstock-app-cli-1 | grep healthy && break
                       echo 'Waiting for healthcheck...'
                       sleep 5
                     done
