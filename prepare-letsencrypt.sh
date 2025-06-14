@@ -5,7 +5,7 @@
 SERVER_IP="217.198.13.171"
 SERVER_USER="root"
 SSH_KEY_PATH="$HOME/.ssh/id_rsa"   # Путь к твоему приватному ключу
-DEPLOY_PATH="/srv/your-project"
+DEPLOY_PATH="/srv/2bstock-app"
 
 # === ЗАПУСК ===
 
