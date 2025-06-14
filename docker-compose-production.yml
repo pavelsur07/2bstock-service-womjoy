@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+    
+    php-fpm:
+        build:
+            context: .
+            dockerfile: site/docker/production/php-fpm/Dockerfile
+        container_name: php-fpm
+        restart: always
+        env_file:
+            - .env
+        volumes:
+            - .:/var/www/html
+        networks:
+            - app-network
+    
+    cli:
+        build:
+            context: .
+            dockerfile: site/docker/production/cli/Dockerfile
+        container_name: php-cli
+        restart: always
+        env_file:
+            - .env
+        volumes:
+            - .:/var/www/html
+        networks:
+            - app-network
+    
+    nginx:
+        image: nginx:1.25-alpine
+        container_name: nginx
+        restart: always
+        ports:
+            - "80:80"
+        volumes:
+            - ./site/docker/common/nginx/conf.d:/etc/nginx/conf.d
+            - .:/var/www/html
+        depends_on:
+            - php-fpm
+        networks:
+            - app-network
+
+networks:
+    app-network:
+        driver: bridge
