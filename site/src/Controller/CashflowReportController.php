@@ -18,11 +18,16 @@ class CashflowReportController extends AbstractController
         $dateFrom = $request->query->get('dateFrom');
         $dateTo = $request->query->get('dateTo');
 
+        $dateToDt = null;
+        if ($dateTo) {
+            $dateToDt = (new \DateTimeImmutable($dateTo))->setTime(23, 59, 59);
+        }
+
         $data = $service->build(
             $company,
             $projectId ?: null,
             $dateFrom ? new \DateTimeImmutable($dateFrom) : null,
-            $dateTo ? new \DateTimeImmutable($dateTo) : null,
+            $dateToDt,
         );
         return $this->render('finance/cashflow/report_grouped.html.twig', $data);
 
