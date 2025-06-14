@@ -10,7 +10,7 @@ services:
             - --entryPoints.http.address=:80
             - --entryPoints.https.address=:443
             - --certificatesresolvers.myresolver.acme.tlschallenge=true
-            - --certificatesresolvers.myresolver.acme.email=youremail@example.com
+            - --certificatesresolvers.myresolver.acme.email=info@2bstock.ru
             - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
         ports:
             - "80:80"
@@ -21,26 +21,6 @@ services:
             - ./letsencrypt:/letsencrypt
         networks:
             - traefik-public
-    
-    nginx:
-        build:
-            context: .
-            dockerfile: site/docker/production/nginx/Dockerfile
-        container_name: nginx
-        restart: always
-        depends_on:
-            - php-fpm
-        volumes:
-            - .:/var/www/html
-            - ./site/docker/common/nginx/conf.d:/etc/nginx/conf.d
-        labels:
-            - traefik.enable=true
-            - traefik.http.routers.site.rule=Host(`app.2bstock.ru`)
-            - traefik.http.routers.site.entryPoints=https
-            - traefik.http.routers.site.tls.certresolver=myresolver
-        networks:
-            - traefik-public
-            - default
     
     php-fpm:
         build:
@@ -54,7 +34,14 @@ services:
             REDIS_URL: ${REDIS_URL}
         volumes:
             - .:/var/www/html
+        labels:
+            - traefik.enable=true
+            - traefik.http.routers.site.rule=Host(`app.2bstock.ru`)
+            - traefik.http.routers.site.entryPoints=https
+            - traefik.http.routers.site.tls.certresolver=myresolver
+            - traefik.http.services.site.loadbalancer.server.port=9000
         networks:
+            - traefik-public
             - default
     
     cli:
