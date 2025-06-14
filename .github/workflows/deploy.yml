@@ -1,0 +1,39 @@
+name: Deploy to Production
+
+on:
+    push:
+        branches: [ master ]
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        
+        env:
+            APP_ENV: ${{ secrets.APP_ENV }}
+            POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+            REDIS_URL: ${{ secrets.REDIS_URL }}
+            SERVER_HOST: ${{ secrets.SERVER_HOST }}
+            SERVER_USER: ${{ secrets.SERVER_USER }}
+        
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v3
+            
+            - name: Setup SSH
+              uses: webfactory/ssh-agent@v0.8.0
+              with:
+                  ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+            
+            - name: Sync project to server
+              run: |
+                  rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no" ./ ${SERVER_USER}@${SERVER_HOST}:/srv/2bstock-app/
+            
+            - name: Deploy containers
+              run: |
+                  ssh -o StrictHostKeyChecking=no ${SERVER_USER}@${SERVER_HOST} << EOF
+                    cd /srv/2bstock-app
+                    export APP_ENV=${APP_ENV}
+                    export POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+                    export REDIS_URL=${REDIS_URL}
+                    docker compose -f docker-compose-production.yml up -d --build
+                  EOF
