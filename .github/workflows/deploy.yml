@@ -40,7 +40,7 @@ jobs:
             
             - name: Sleep before migrations
               run: |
-                  ssh -o StrictHostKeyChecking=no ${SERVER_USER}@${SERVER_HOST} "sleep 35"
+                  ssh -o StrictHostKeyChecking=no ${SERVER_USER}@${SERVER_HOST} "sleep 60"
             
             - name: Run DB migrations
               run: |
