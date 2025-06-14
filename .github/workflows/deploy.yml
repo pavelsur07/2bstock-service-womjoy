@@ -37,3 +37,14 @@ jobs:
                     export REDIS_URL=${REDIS_URL}
                     docker compose -f docker-compose-production.yml up -d --build
                   EOF
+            
+            - name: Sleep before migrations
+              run: |
+                  ssh -o StrictHostKeyChecking=no ${SERVER_USER}@${SERVER_HOST} "sleep 60"
+            
+            - name: Run DB migrations
+              run: |
+                  ssh -o StrictHostKeyChecking=no ${SERVER_USER}@${SERVER_HOST} << EOF
+                    cd /srv/2bstock-app
+                    docker compose exec -T cli php bin/console doctrine:migrations:migrate --no-interaction
+                  EOF
