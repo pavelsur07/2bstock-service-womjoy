@@ -76,7 +76,7 @@ services:
         build:
             context: .
             dockerfile: site/docker/production/cli/Dockerfile
-        container_name: cli
+        container_name: cli-migration
         environment:
             APP_ENV: ${APP_ENV}
             DATABASE_URL: postgres://app:${POSTGRES_PASSWORD}@postgres:5432/app
