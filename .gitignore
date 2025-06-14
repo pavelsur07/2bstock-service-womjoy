@@ -1,13 +1,13 @@
-<<<<<<< HEAD
-# These are some examples of commonly ignored file patterns.
-# You should customize this list as applicable to your project.
-# Learn more about .gitignore:
-#     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
-
 # Node artifact files
 node_modules/
 dist/
+
+# Custom directories
 /xxx
+/xxx-pass
+/storage/docker/elasticsearch/
+/shopingo/
+
 # Compiled Java class files
 *.class
 
@@ -47,10 +47,3 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
-
-=======
-###> symfony/framework-bundle ###
->>>>>>> Start
-/xxx-pass
-/storage/docker/elasticsearch/
-/shopingo/
