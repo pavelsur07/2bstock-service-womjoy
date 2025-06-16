@@ -38,4 +38,11 @@ jobs:
             
             - name: Run DB migrations (через docker run)
               run: |
-                  ssh -o StrictHostKeyChecking=no ${SERVER_USER}@${SERVER_HOST} 'docker run --rm --network 2bstock-app_default -v /srv/2bstock-app:/var/www/html -w /var/www/html php:8.2-cli-alpine php bin/console doctrine:migrations:migrate --no-interaction'
+                  ssh -o StrictHostKeyChecking=no ${SERVER_USER}@${SERVER_HOST} '
+                    docker run --rm \
+                    --network 2bstock-app_default \
+                    -v /srv/2bstock-app/site:/var/www/html \
+                    -w /var/www/html \
+                    php:8.2-cli-alpine \
+                    php bin/console doctrine:migrations:migrate --no-interaction
+                  '
