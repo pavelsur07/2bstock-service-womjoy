@@ -85,7 +85,7 @@ services:
         build:
             context: .
             dockerfile: site/docker/production/cli/Dockerfile
-        container_name: cli
+        container_name: cli-migration
         restart: always
         environment:
             APP_ENV: ${APP_ENV}
