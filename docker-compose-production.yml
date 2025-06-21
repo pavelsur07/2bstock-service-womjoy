@@ -81,27 +81,6 @@ services:
             retries: 5
         networks:
             - default
-    cli-migration:
-        build:
-            context: .
-            dockerfile: site/docker/production/cli/Dockerfile
-        container_name: cli-migration
-        restart: always
-        environment:
-            APP_ENV: ${APP_ENV}
-            DATABASE_URL: postgres://app:${POSTGRES_PASSWORD}@postgres:5432/app
-            REDIS_URL: ${REDIS_URL}
-        command: sh -c 'wait-for-it postgres:5432 -t 60 && php bin/console doctrine:migrations:migrate --no-interaction'
-        volumes:
-            - .:/var/www/html
-        healthcheck:
-            test: [ "CMD", "php", "-r", "exit(0);" ]
-            interval: 10s
-            timeout: 5s
-            retries: 5
-        networks:
-            - default
-    
     postgres:
         image: postgres:15-alpine
         container_name: postgres
